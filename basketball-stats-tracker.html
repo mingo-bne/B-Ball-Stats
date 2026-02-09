@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Stats Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .game-info input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        .roster-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .roster-panel h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .add-player {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .add-player input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .add-player input:first-child {
+            flex: 0 0 60px;
+        }
+
+        .add-player button {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .add-player button:hover {
+            background: #45a049;
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-item {
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-item:hover {
+            background: #e8f5e9;
+        }
+
+        .player-item.selected {
+            background: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+
+        .player-info {
+            font-weight: 600;
+        }
+
+        .player-jersey {
+            display: inline-block;
+            background: #1e3c72;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .player-item.selected .player-jersey {
+            background: white;
+            color: #4CAF50;
+        }
+
+        .remove-player {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .tracking-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-button {
+            padding: 20px;
+            background: #f5f5f5;
+            border: 3px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .stat-button:hover {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+        }
+
+        .stat-button.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+
+        .stat-button.active .stat-icon {
+            color: white;
+        }
+
+        .quick-entry {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .quick-entry h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+
+        .current-selection {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .current-selection div {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .current-selection strong {
+            color: #1e3c72;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .action-btn.made {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .action-btn.made:hover {
+            background: #45a049;
+        }
+
+        .action-btn.missed {
+            background: #f44336;
+            color: white;
+        }
+
+        .action-btn.missed:hover {
+            background: #da190b;
+        }
+
+        .action-btn.count {
+            background: #2196F3;
+            color: white;
+        }
+
+        .action-btn.count:hover {
+            background: #0b7dda;
+        }
+
+        .play-log {
+            margin-top: 20px;
+        }
+
+        .play-log h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .play-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .play-item.missed {
+            border-left-color: #f44336;
+        }
+
+        .undo-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .undo-btn:hover {
+            background: #f57c00;
+        }
+
+        .stats-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .stats-summary h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .player-stats {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .player-stats-name {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .export-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .export-btn:hover {
+            background: #2a5298;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-categories {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏀 Basketball Stats Tracker</h1>
+            <div class="game-info">
+                <input type="text" id="teamName" placeholder="Team Name">
+                <input type="text" id="opponent" placeholder="vs Opponent">
+                <input type="date" id="gameDate">
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="roster-panel">
+                <h2>Roster</h2>
+                <div class="add-player">
+                    <input type="number" id="jerseyInput" placeholder="#" min="0" max="99">
+                    <input type="text" id="nameInput" placeholder="Player Name">
+                    <button onclick="addPlayer()">Add</button>
+                </div>
+                <div class="player-list" id="playerList"></div>
+            </div>
+
+            <div class="tracking-panel">
+                <h2 style="color: #1e3c72; margin-bottom: 15px;">Play-by-Play Entry</h2>
+                
+                <div class="stat-categories">
+                    <div class="stat-button" onclick="selectStat('2pt')">
+                        <div class="stat-icon">2PT</div>
+                        <div>2-Point</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('3pt')">
+                        <div class="stat-icon">3PT</div>
+                        <div>3-Point</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('ft')">
+                        <div class="stat-icon">1PT</div>
+                        <div>Free Throw</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('rebound')">
+                        <div class="stat-icon">💪</div>
+                        <div>Rebound</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('assist')">
+                        <div class="stat-icon">🤝</div>
+                        <div>Assist</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('steal')">
+                        <div class="stat-icon">👐</div>
+                        <div>Steal</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('block')">
+                        <div class="stat-icon">🚫</div>
+                        <div>Block</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('turnover')">
+                        <div class="stat-icon">❌</div>
+                        <div>Turnover</div>
+                    </div>
+                    <div class="stat-button" onclick="selectStat('foul')">
+                        <div class="stat-icon">⚠️</div>
+                        <div>Foul</div>
+                    </div>
+                </div>
+
+                <div class="quick-entry">
+                    <h3>Quick Entry</h3>
+                    <div class="current-selection" id="currentSelection">
+                        <div><strong>Player:</strong> <span id="selectedPlayerDisplay">None</span></div>
+                        <div><strong>Stat:</strong> <span id="selectedStatDisplay">None</span></div>
+                    </div>
+                    <div class="action-buttons" id="actionButtons"></div>
+                </div>
+
+                <div class="play-log">
+                    <h3>Recent Plays</h3>
+                    <div id="playLog"></div>
+                </div>
+
+                <div class="stats-summary">
+                    <h3>Game Statistics</h3>
+                    <div class="stats-grid" id="statsGrid"></div>
+                    <button class="export-btn" onclick="exportStats()">Export Stats (CSV)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let players = [];
+        let selectedPlayer = null;
+        let selectedStat = null;
+        let playLog = [];
+        let stats = {};
+
+        // Set today's date
+        document.getElementById('gameDate').valueAsDate = new Date();
+
+        function addPlayer() {
+            const jersey = document.getElementById('jerseyInput').value;
+            const name = document.getElementById('nameInput').value.trim();
+
+            if (!jersey || !name) {
+                alert('Please enter both jersey number and player name');
+                return;
+            }
+
+            if (players.some(p => p.jersey === jersey)) {
+                alert('Jersey number already exists');
+                return;
+            }
+
+            const player = { jersey, name };
+            players.push(player);
+            stats[`${jersey}-${name}`] = initPlayerStats();
+
+            document.getElementById('jerseyInput').value = '';
+            document.getElementById('nameInput').value = '';
+
+            renderPlayers();
+            renderStats();
+        }
+
+        function initPlayerStats() {
+            return {
+                '2pt_made': 0, '2pt_attempted': 0,
+                '3pt_made': 0, '3pt_attempted': 0,
+                'ft_made': 0, 'ft_attempted': 0,
+                'rebounds': 0, 'assists': 0, 'steals': 0,
+                'blocks': 0, 'turnovers': 0, 'fouls': 0
+            };
+        }
+
+        function renderPlayers() {
+            const list = document.getElementById('playerList');
+            list.innerHTML = players.map(p => `
+                <div class="player-item ${selectedPlayer === p ? 'selected' : ''}" onclick="selectPlayer('${p.jersey}')">
+                    <div class="player-info">
+                        <span class="player-jersey">#${p.jersey}</span>
+                        ${p.name}
+                    </div>
+                    <button class="remove-player" onclick="event.stopPropagation(); removePlayer('${p.jersey}')">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removePlayer(jersey) {
+            const player = players.find(p => p.jersey === jersey);
+            if (confirm(`Remove ${player.name} from roster?`)) {
+                players = players.filter(p => p.jersey !== jersey);
+                delete stats[`${jersey}-${player.name}`];
+                if (selectedPlayer && selectedPlayer.jersey === jersey) {
+                    selectedPlayer = null;
+                    updateDisplay();
+                }
+                renderPlayers();
+                renderStats();
+            }
+        }
+
+        function selectPlayer(jersey) {
+            selectedPlayer = players.find(p => p.jersey === jersey);
+            renderPlayers();
+            updateDisplay();
+        }
+
+        function selectStat(stat) {
+            selectedStat = stat;
+            document.querySelectorAll('.stat-button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('selectedPlayerDisplay').textContent = 
+                selectedPlayer ? `#${selectedPlayer.jersey} ${selectedPlayer.name}` : 'None';
+            document.getElementById('selectedStatDisplay').textContent = 
+                selectedStat ? formatStatName(selectedStat) : 'None';
+
+            renderActionButtons();
+        }
+
+        function renderActionButtons() {
+            const container = document.getElementById('actionButtons');
+            
+            if (!selectedPlayer || !selectedStat) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Select a player and stat category to begin</div>';
+                return;
+            }
+
+            const shootingStats = ['2pt', '3pt', 'ft'];
+            if (shootingStats.includes(selectedStat)) {
+                container.innerHTML = `
+                    <button class="action-btn made" onclick="recordStat(true)">✓ Made</button>
+                    <button class="action-btn missed" onclick="recordStat(false)">✗ Missed</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button class="action-btn count" onclick="recordStat(true)">+ Record ${formatStatName(selectedStat)}</button>
+                `;
+            }
+        }
+
+        function recordStat(made) {
+            if (!selectedPlayer || !selectedStat) return;
+
+            const key = `${selectedPlayer.jersey}-${selectedPlayer.name}`;
+            const play = {
+                time: new Date().toLocaleTimeString(),
+                player: selectedPlayer,
+                stat: selectedStat,
+                made: made,
+                key: key
+            };
+
+            playLog.unshift(play);
+
+            if (['2pt', '3pt', 'ft'].includes(selectedStat)) {
+                stats[key][`${selectedStat}_attempted`]++;
+                if (made) {
+                    stats[key][`${selectedStat}_made`]++;
+                }
+            } else {
+                const statKey = selectedStat === 'rebound' ? 'rebounds' : 
+                               selectedStat === 'assist' ? 'assists' :
+                               selectedStat === 'steal' ? 'steals' :
+                               selectedStat === 'block' ? 'blocks' :
+                               selectedStat === 'turnover' ? 'turnovers' : 'fouls';
+                stats[key][statKey]++;
+            }
+
+            renderPlayLog();
+            renderStats();
+        }
+
+        function renderPlayLog() {
+            const log = document.getElementById('playLog');
+            log.innerHTML = playLog.slice(0, 10).map((play, index) => `
+                <div class="play-item ${play.made === false ? 'missed' : ''}">
+                    <div>
+                        <strong>#${play.player.jersey} ${play.player.name}</strong> - 
+                        ${formatStatName(play.stat)} ${play.made === true ? '✓' : play.made === false ? '✗' : ''}
+                        <small style="color: #999; margin-left: 10px;">${play.time}</small>
+                    </div>
+                    <button class="undo-btn" onclick="undoPlay(${index})">Undo</button>
+                </div>
+            `).join('');
+        }
+
+        function undoPlay(index) {
+            const play = playLog[index];
+            const key = play.key;
+
+            if (['2pt', '3pt', 'ft'].includes(play.stat)) {
+                stats[key][`${play.stat}_attempted`]--;
+                if (play.made) {
+                    stats[key][`${play.stat}_made`]--;
+                }
+            } else {
+                const statKey = play.stat === 'rebound' ? 'rebounds' : 
+                               play.stat === 'assist' ? 'assists' :
+                               play.stat === 'steal' ? 'steals' :
+                               play.stat === 'block' ? 'blocks' :
+                               play.stat === 'turnover' ? 'turnovers' : 'fouls';
+                stats[key][statKey]--;
+            }
+
+            playLog.splice(index, 1);
+            renderPlayLog();
+            renderStats();
+        }
+
+        function renderStats() {
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = players.map(player => {
+                const key = `${player.jersey}-${player.name}`;
+                const s = stats[key];
+                const points = (s['2pt_made'] * 2) + (s['3pt_made'] * 3) + s['ft_made'];
+                const fgPct = s['2pt_attempted'] > 0 ? ((s['2pt_made'] / s['2pt_attempted']) * 100).toFixed(1) : 0;
+                const tpPct = s['3pt_attempted'] > 0 ? ((s['3pt_made'] / s['3pt_attempted']) * 100).toFixed(1) : 0;
+                const ftPct = s['ft_attempted'] > 0 ? ((s['ft_made'] / s['ft_attempted']) * 100).toFixed(1) : 0;
+
+                return `
+                    <div class="player-stats">
+                        <div class="player-stats-name">#${player.jersey} ${player.name}</div>
+                        <div class="stat-line"><span class="stat-label">Points:</span> <span class="stat-value">${points}</span></div>
+                        <div class="stat-line"><span class="stat-label">2PT:</span> <span class="stat-value">${s['2pt_made']}/${s['2pt_attempted']} (${fgPct}%)</span></div>
+                        <div class="stat-line"><span class="stat-label">3PT:</span> <span class="stat-value">${s['3pt_made']}/${s['3pt_attempted']} (${tpPct}%)</span></div>
+                        <div class="stat-line"><span class="stat-label">FT:</span> <span class="stat-value">${s['ft_made']}/${s['ft_attempted']} (${ftPct}%)</span></div>
+                        <div class="stat-line"><span class="stat-label">REB:</span> <span class="stat-value">${s.rebounds}</span></div>
+                        <div class="stat-line"><span class="stat-label">AST:</span> <span class="stat-value">${s.assists}</span></div>
+                        <div class="stat-line"><span class="stat-label">STL:</span> <span class="stat-value">${s.steals}</span></div>
+                        <div class="stat-line"><span class="stat-label">BLK:</span> <span class="stat-value">${s.blocks}</span></div>
+                        <div class="stat-line"><span class="stat-label">TO:</span> <span class="stat-value">${s.turnovers}</span></div>
+                        <div class="stat-line"><span class="stat-label">PF:</span> <span class="stat-value">${s.fouls}</span></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatStatName(stat) {
+            const names = {
+                '2pt': '2-Point',
+                '3pt': '3-Point',
+                'ft': 'Free Throw',
+                'rebound': 'Rebound',
+                'assist': 'Assist',
+                'steal': 'Steal',
+                'block': 'Block',
+                'turnover': 'Turnover',
+                'foul': 'Foul'
+            };
+            return names[stat] || stat;
+        }
+
+        function exportStats() {
+            const teamName = document.getElementById('teamName').value || 'Team';
+            const opponent = document.getElementById('opponent').value || 'Opponent';
+            const gameDate = document.getElementById('gameDate').value;
+
+            let csv = `Basketball Game Statistics\n`;
+            csv += `${teamName} vs ${opponent}\n`;
+            csv += `Date: ${gameDate}\n\n`;
+            csv += `Player,Jersey,PTS,2PM-A,2P%,3PM-A,3P%,FTM-A,FT%,REB,AST,STL,BLK,TO,PF\n`;
+
+            players.forEach(player => {
+                const key = `${player.jersey}-${player.name}`;
+                const s = stats[key];
+                const points = (s['2pt_made'] * 2) + (s['3pt_made'] * 3) + s['ft_made'];
+                const fgPct = s['2pt_attempted'] > 0 ? ((s['2pt_made'] / s['2pt_attempted']) * 100).toFixed(1) : 0;
+                const tpPct = s['3pt_attempted'] > 0 ? ((s['3pt_made'] / s['3pt_attempted']) * 100).toFixed(1) : 0;
+                const ftPct = s['ft_attempted'] > 0 ? ((s['ft_made'] / s['ft_attempted']) * 100).toFixed(1) : 0;
+
+                csv += `${player.name},${player.jersey},${points},${s['2pt_made']}-${s['2pt_attempted']},${fgPct}%,${s['3pt_made']}-${s['3pt_attempted']},${tpPct}%,${s['ft_made']}-${s['ft_attempted']},${ftPct}%,${s.rebounds},${s.assists},${s.steals},${s.blocks},${s.turnovers},${s.fouls}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `basketball-stats-${gameDate || 'game'}.csv`;
+            a.click();
+        }
+    </script>
+</body>
+</html>
