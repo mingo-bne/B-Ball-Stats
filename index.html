@@ -34,6 +34,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -102,6 +106,7 @@
             display: grid;
             grid-template-columns: 300px 1fr;
             gap: 20px;
+            align-items: start;
         }
 
         .roster-panel {
@@ -109,7 +114,10 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            height: fit-content;
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
         }
 
         .roster-panel h2 {
@@ -256,23 +264,29 @@
         }
 
         .quick-entry {
-            background: #f9f9f9;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .quick-entry h3 {
-            color: #1e3c72;
+            color: white;
             margin-bottom: 15px;
+            font-size: 18px;
         }
 
         .current-selection {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 15px;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid white;
         }
 
         .current-selection div {
@@ -287,44 +301,51 @@
         .action-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
+            gap: 12px;
         }
 
         .action-btn {
-            padding: 15px;
+            padding: 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 18px;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .action-btn.made {
-            background: #4CAF50;
-            color: white;
+            background: white;
+            color: #4CAF50;
+            border: 3px solid white;
         }
 
         .action-btn.made:hover {
-            background: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
         .action-btn.missed {
-            background: #f44336;
-            color: white;
+            background: white;
+            color: #f44336;
+            border: 3px solid white;
         }
 
         .action-btn.missed:hover {
-            background: #da190b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
         }
 
         .action-btn.count {
-            background: #2196F3;
-            color: white;
+            background: white;
+            color: #2196F3;
+            border: 3px solid white;
         }
 
         .action-btn.count:hover {
-            background: #0b7dda;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
         }
 
         .play-log {
@@ -502,6 +523,11 @@
             font-size: 14px;
         }
 
+        .form-group input[type="color"] {
+            height: 50px;
+            cursor: pointer;
+        }
+
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -612,8 +638,29 @@
                 grid-template-columns: 1fr;
             }
 
+            .roster-panel {
+                position: relative;
+                top: 0;
+                max-height: 400px;
+            }
+
+            .quick-entry {
+                position: sticky;
+                top: 0;
+            }
+
+            .tracking-panel > div:first-child {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
             .stat-categories {
                 grid-template-columns: repeat(3, 1fr);
+            }
+
+            .action-btn {
+                padding: 15px;
+                font-size: 16px;
             }
         }
     </style>
@@ -647,8 +694,31 @@
             </div>
 
             <div class="tracking-panel">
-                <h2 style="color: #1e3c72; margin-bottom: 15px;">Play-by-Play Entry</h2>
-                
+                <!-- Dual Quick Entry Panels - Sticky at top -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100;">
+                    <!-- Panel 1: Last Player (Retained) -->
+                    <div class="quick-entry" style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);">
+                        <h3>🔥 Last Player</h3>
+                        <div class="current-selection" id="currentSelection1">
+                            <div><strong>Player:</strong> <span id="selectedPlayerDisplay1">None</span></div>
+                            <div><strong>Stat:</strong> <span id="selectedStatDisplay1">None</span></div>
+                        </div>
+                        <div class="action-buttons" id="actionButtons1"></div>
+                    </div>
+
+                    <!-- Panel 2: New Selection (Flexible) -->
+                    <div class="quick-entry" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
+                        <h3>⚡ New Selection</h3>
+                        <div class="current-selection" id="currentSelection2">
+                            <div><strong>Player:</strong> <span id="selectedPlayerDisplay2">None</span></div>
+                            <div><strong>Stat:</strong> <span id="selectedStatDisplay2">None</span></div>
+                        </div>
+                        <div class="action-buttons" id="actionButtons2"></div>
+                    </div>
+                </div>
+
+                <!-- Stat Categories -->
+                <h2 style="color: #1e3c72; margin-bottom: 15px;">Stat Categories</h2>
                 <div class="stat-categories">
                     <div class="stat-button" onclick="selectStat('2pt')">
                         <div class="stat-icon">2PT</div>
@@ -688,15 +758,6 @@
                     </div>
                 </div>
 
-                <div class="quick-entry">
-                    <h3>Quick Entry</h3>
-                    <div class="current-selection" id="currentSelection">
-                        <div><strong>Player:</strong> <span id="selectedPlayerDisplay">None</span></div>
-                        <div><strong>Stat:</strong> <span id="selectedStatDisplay">None</span></div>
-                    </div>
-                    <div class="action-buttons" id="actionButtons"></div>
-                </div>
-
                 <div class="play-log">
                     <h3>Recent Plays</h3>
                     <div id="playLog"></div>
@@ -724,8 +785,9 @@
                     <input type="text" id="newTeamName" placeholder="Enter team name" />
                 </div>
                 <div class="form-group">
-                    <label for="newTeamColor">Team Color (optional)</label>
-                    <input type="color" id="newTeamColor" value="#1e3c72" />
+                    <label for="newTeamColor">Team Color</label>
+                    <input type="color" id="newTeamColor" value="#1e3c72" style="width: 100%; height: 50px;" />
+                    <small style="color: #666; margin-top: 5px; display: block;">Choose a color to represent this team</small>
                 </div>
             </div>
             <div class="modal-actions">
@@ -756,7 +818,9 @@
         let currentTeamId = null;
         let players = [];
         let selectedPlayer = null;
+        let lastPlayer = null; // Retained player from last entry
         let selectedStat = null;
+        let lastStat = null; // Retained stat from last entry
         let playLog = [];
         let stats = {};
 
@@ -831,10 +895,13 @@
 
             container.innerHTML = teamArray.map(team => `
                 <div class="team-list-item">
-                    <div class="team-list-item-info">
-                        <div class="team-list-item-name">${team.name}</div>
-                        <div class="team-list-item-details">
-                            ${team.players?.length || 0} players · ${team.games?.length || 0} games
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 30px; height: 30px; background: ${team.color || '#1e3c72'}; border-radius: 6px; border: 2px solid #e0e0e0;"></div>
+                        <div class="team-list-item-info">
+                            <div class="team-list-item-name">${team.name}</div>
+                            <div class="team-list-item-details">
+                                ${team.players?.length || 0} players · ${team.games?.length || 0} games
+                            </div>
                         </div>
                     </div>
                     <div class="team-list-actions">
@@ -887,11 +954,18 @@
             
             selector.innerHTML = '<option value="">Select Team...</option>' +
                 teamArray.map(team => 
-                    `<option value="${team.id}">${team.name}</option>`
+                    `<option value="${team.id}" style="padding-left: 10px;">${team.name}</option>`
                 ).join('');
             
             if (currentTeamId) {
                 selector.value = currentTeamId;
+                // Update selector background color to match team
+                const currentTeam = teams[currentTeamId];
+                if (currentTeam && currentTeam.color) {
+                    selector.style.borderLeft = `4px solid ${currentTeam.color}`;
+                }
+            } else {
+                selector.style.borderLeft = '2px solid #e0e0e0';
             }
         }
 
@@ -905,6 +979,8 @@
                 playLog = [];
                 selectedPlayer = null;
                 selectedStat = null;
+                lastPlayer = null;
+                lastStat = null;
                 renderPlayers();
                 renderPlayLog();
                 renderStats();
@@ -955,6 +1031,8 @@
             playLog = [];
             selectedPlayer = null;
             selectedStat = null;
+            lastPlayer = null;  // Reset last player when switching teams
+            lastStat = null;    // Reset last stat when switching teams
 
             // Initialize stats for any players that don't have them
             players.forEach(player => {
@@ -1064,70 +1142,113 @@
         }
 
         function updateDisplay() {
-            document.getElementById('selectedPlayerDisplay').textContent = 
+            // Panel 1: Last Player (Orange - Retained)
+            document.getElementById('selectedPlayerDisplay1').textContent = 
+                lastPlayer ? `#${lastPlayer.jersey} ${lastPlayer.name}` : 'None';
+            document.getElementById('selectedStatDisplay1').textContent = 
+                lastStat ? formatStatName(lastStat) : 'None';
+
+            // Panel 2: New Selection (Green - Flexible)
+            document.getElementById('selectedPlayerDisplay2').textContent = 
                 selectedPlayer ? `#${selectedPlayer.jersey} ${selectedPlayer.name}` : 'None';
-            document.getElementById('selectedStatDisplay').textContent = 
+            document.getElementById('selectedStatDisplay2').textContent = 
                 selectedStat ? formatStatName(selectedStat) : 'None';
 
             renderActionButtons();
         }
 
         function renderActionButtons() {
-            const container = document.getElementById('actionButtons');
+            const container1 = document.getElementById('actionButtons1');
+            const container2 = document.getElementById('actionButtons2');
             
             if (!currentTeamId) {
-                container.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Select a team to begin tracking</div>';
+                container1.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px; font-size: 14px;">Select a team to begin</div>';
+                container2.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px; font-size: 14px;">Select a team to begin</div>';
                 return;
             }
 
-            if (!selectedPlayer || !selectedStat) {
-                container.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Select a player and stat category to begin</div>';
-                return;
-            }
-
-            const shootingStats = ['2pt', '3pt', 'ft'];
-            if (shootingStats.includes(selectedStat)) {
-                container.innerHTML = `
-                    <button class="action-btn made" onclick="recordStat(true)">✓ Made</button>
-                    <button class="action-btn missed" onclick="recordStat(false)">✗ Missed</button>
-                `;
+            // Panel 1: Last Player buttons
+            if (!lastPlayer || !lastStat) {
+                container1.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px; font-size: 14px;">Record a stat to activate</div>';
             } else {
-                container.innerHTML = `
-                    <button class="action-btn count" onclick="recordStat(true)">+ Record ${formatStatName(selectedStat)}</button>
-                `;
+                const shootingStats = ['2pt', '3pt', 'ft'];
+                if (shootingStats.includes(lastStat)) {
+                    container1.innerHTML = `
+                        <button class="action-btn made" onclick="recordStat(true, 'last')">✓ Made</button>
+                        <button class="action-btn missed" onclick="recordStat(false, 'last')">✗ Missed</button>
+                    `;
+                } else {
+                    container1.innerHTML = `
+                        <button class="action-btn count" onclick="recordStat(true, 'last')">+ ${formatStatName(lastStat)}</button>
+                    `;
+                }
+            }
+
+            // Panel 2: New Selection buttons
+            if (!selectedPlayer || !selectedStat) {
+                container2.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px; font-size: 14px;">Select player & stat</div>';
+            } else {
+                const shootingStats = ['2pt', '3pt', 'ft'];
+                if (shootingStats.includes(selectedStat)) {
+                    container2.innerHTML = `
+                        <button class="action-btn made" onclick="recordStat(true, 'new')">✓ Made</button>
+                        <button class="action-btn missed" onclick="recordStat(false, 'new')">✗ Missed</button>
+                    `;
+                } else {
+                    container2.innerHTML = `
+                        <button class="action-btn count" onclick="recordStat(true, 'new')">+ ${formatStatName(selectedStat)}</button>
+                    `;
+                }
             }
         }
 
-        function recordStat(made) {
-            if (!selectedPlayer || !selectedStat || !currentTeamId) return;
+        function recordStat(made, panel) {
+            let player, stat;
 
-            const key = `${selectedPlayer.jersey}-${selectedPlayer.name}`;
+            if (panel === 'last') {
+                // Using Panel 1: Last Player
+                if (!lastPlayer || !lastStat) return;
+                player = lastPlayer;
+                stat = lastStat;
+            } else {
+                // Using Panel 2: New Selection
+                if (!selectedPlayer || !selectedStat || !currentTeamId) return;
+                player = selectedPlayer;
+                stat = selectedStat;
+
+                // Update last player/stat after recording (retain for Panel 1)
+                lastPlayer = selectedPlayer;
+                lastStat = selectedStat;
+            }
+
+            const key = `${player.jersey}-${player.name}`;
             const play = {
                 time: new Date().toLocaleTimeString(),
-                player: selectedPlayer,
-                stat: selectedStat,
+                player: player,
+                stat: stat,
                 made: made,
                 key: key
             };
 
             playLog.unshift(play);
 
-            if (['2pt', '3pt', 'ft'].includes(selectedStat)) {
-                stats[key][`${selectedStat}_attempted`]++;
+            if (['2pt', '3pt', 'ft'].includes(stat)) {
+                stats[key][`${stat}_attempted`]++;
                 if (made) {
-                    stats[key][`${selectedStat}_made`]++;
+                    stats[key][`${stat}_made`]++;
                 }
             } else {
-                const statKey = selectedStat === 'rebound' ? 'rebounds' : 
-                               selectedStat === 'assist' ? 'assists' :
-                               selectedStat === 'steal' ? 'steals' :
-                               selectedStat === 'block' ? 'blocks' :
-                               selectedStat === 'turnover' ? 'turnovers' : 'fouls';
+                const statKey = stat === 'rebound' ? 'rebounds' : 
+                               stat === 'assist' ? 'assists' :
+                               stat === 'steal' ? 'steals' :
+                               stat === 'block' ? 'blocks' :
+                               stat === 'turnover' ? 'turnovers' : 'fouls';
                 stats[key][statKey]++;
             }
 
             renderPlayLog();
             renderStats();
+            updateDisplay();
             saveCurrentTeamData();
         }
 
