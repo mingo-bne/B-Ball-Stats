@@ -441,6 +441,63 @@
             margin-top: 10px;
         }
 
+        /* Jersey Number Display - NBA Bulls Style */
+        .jersey-display {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .jersey-display:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .jersey-display:active {
+            transform: scale(0.98);
+        }
+
+        .jersey-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 
+                3px 3px 0 rgba(0, 0, 0, 0.3),
+                -1px -1px 0 rgba(0, 0, 0, 0.2);
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        /* Highlight jersey when panel is active */
+        .panel-active .jersey-display {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.7);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+            }
+        }
+
         .current-selection {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
@@ -1002,6 +1059,15 @@
             display: none;
         }
 
+        body.theme-default .jersey-display {
+            background: white;
+            border: 3px solid #e0e0e0;
+        }
+
+        body.theme-default .jersey-number {
+            color: #1e3c72;
+        }
+
         /* Titanium Theme */
         body.theme-titanium {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -1085,6 +1151,15 @@
         body.theme-titanium .stat-button.active .stat-icon {
             color: white;
         }
+
+        body.theme-titanium .jersey-display {
+            background: linear-gradient(145deg, #424f5e, #35424f);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.theme-titanium .jersey-number {
+            color: #ecf0f1;
+        }
     </style>
 </head>
 <body>
@@ -1126,23 +1201,33 @@
                 <!-- Dual Quick Entry Panels - Active/Inactive Toggle -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100;">
                     <!-- Panel A - RGB(24, 40, 73) -->
-                    <div class="quick-entry panel-inactive" id="panelA" onclick="activatePanel('A')" style="background: linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%);">
+                    <div class="quick-entry panel-inactive" id="panelA" onclick="activatePanelKeepPlayer('A')" style="background: linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%);">
                         <div class="panel-status"></div>
-                        <h3>🔵 Panel A</h3>
-                        <div class="current-selection" id="currentSelectionA">
-                            <div><strong>Player:</strong> <span id="selectedPlayerDisplayA">None</span></div>
-                            <div><strong>Stat:</strong> <span id="selectedStatDisplayA">None</span></div>
+                        <h3 id="panelHeaderA" style="margin-bottom: 10px;">Select Player</h3>
+                        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                            <div class="current-selection" id="currentSelectionA" style="flex: 1; margin-bottom: 0;">
+                                <div><strong>Player:</strong> <span id="selectedPlayerDisplayA">None</span></div>
+                                <div><strong>Stat:</strong> <span id="selectedStatDisplayA">None</span></div>
+                            </div>
+                            <div class="jersey-display" id="jerseyDisplayA" onclick="event.stopPropagation(); showPlayerSelectionForPanel('A')">
+                                <div class="jersey-number">--</div>
+                            </div>
                         </div>
                         <div class="action-buttons" id="actionButtonsA"></div>
                     </div>
 
                     <!-- Panel B - RGB(241, 189, 66) -->
-                    <div class="quick-entry panel-inactive" id="panelB" onclick="activatePanel('B')" style="background: linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%);">
+                    <div class="quick-entry panel-inactive" id="panelB" onclick="activatePanelKeepPlayer('B')" style="background: linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%);">
                         <div class="panel-status"></div>
-                        <h3>🟠 Panel B</h3>
-                        <div class="current-selection" id="currentSelectionB">
-                            <div><strong>Player:</strong> <span id="selectedPlayerDisplayB">None</span></div>
-                            <div><strong>Stat:</strong> <span id="selectedStatDisplayB">None</span></div>
+                        <h3 id="panelHeaderB" style="margin-bottom: 10px;">Select Player</h3>
+                        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                            <div class="current-selection" id="currentSelectionB" style="flex: 1; margin-bottom: 0;">
+                                <div><strong>Player:</strong> <span id="selectedPlayerDisplayB">None</span></div>
+                                <div><strong>Stat:</strong> <span id="selectedStatDisplayB">None</span></div>
+                            </div>
+                            <div class="jersey-display" id="jerseyDisplayB" onclick="event.stopPropagation(); showPlayerSelectionForPanel('B')">
+                                <div class="jersey-number">--</div>
+                            </div>
                         </div>
                         <div class="action-buttons" id="actionButtonsB"></div>
                     </div>
@@ -1572,7 +1657,7 @@
         }
 
         // Panel Management Functions
-        function activatePanel(panel) {
+        function activatePanelKeepPlayer(panel) {
             if (!currentTeamId) {
                 alert('Please select a team first');
                 return;
@@ -1588,22 +1673,40 @@
                 return;
             }
 
-            // Switch active panel
+            // Switch active panel - KEEP the current player, don't show selection modal
             activePanel = panel;
             
             // Update visual state
+            updatePanelVisuals(panel);
+            
+            // If this panel doesn't have a player yet, show selection
+            const currentPanel = panel === 'A' ? panelA : panelB;
+            if (!currentPanel.player) {
+                showPlayerSelectionForPanel(panel);
+            }
+            
+            updateDisplay();
+        }
+
+        function showPlayerSelectionForPanel(panel) {
+            // Store which panel we're selecting for
+            window.selectingForPanel = panel;
+            showPlayerSelectionModal();
+        }
+
+        function updatePanelVisuals(panel) {
             const panelAEl = document.getElementById('panelA');
             const panelBEl = document.getElementById('panelB');
             
             if (panel === 'A') {
                 panelAEl.classList.remove('panel-inactive');
                 panelAEl.classList.add('panel-active');
-                panelAEl.onclick = null; // Remove click handler when active
+                panelAEl.onclick = null;
                 panelAEl.style.background = 'linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%)';
                 
                 panelBEl.classList.remove('panel-active');
                 panelBEl.classList.add('panel-inactive');
-                panelBEl.onclick = () => activatePanel('B');
+                panelBEl.onclick = () => activatePanelKeepPlayer('B');
                 panelBEl.style.background = 'linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%)';
             } else {
                 panelBEl.classList.remove('panel-inactive');
@@ -1613,12 +1716,9 @@
                 
                 panelAEl.classList.remove('panel-active');
                 panelAEl.classList.add('panel-inactive');
-                panelAEl.onclick = () => activatePanel('A');
+                panelAEl.onclick = () => activatePanelKeepPlayer('A');
                 panelAEl.style.background = 'linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%)';
             }
-
-            // Show player selection modal
-            showPlayerSelectionModal();
         }
 
         function showPlayerSelectionModal() {
@@ -1642,7 +1742,10 @@
             const player = players.find(p => p.jersey === jersey);
             if (!player) return;
 
-            if (activePanel === 'A') {
+            // Use the stored panel from showPlayerSelectionForPanel
+            const panel = window.selectingForPanel || activePanel;
+
+            if (panel === 'A') {
                 panelA.player = player;
                 panelA.stat = null; // Reset stat when changing player
             } else {
@@ -1650,8 +1753,15 @@
                 panelB.stat = null; // Reset stat when changing player
             }
 
+            // Make sure this panel is active
+            if (activePanel !== panel) {
+                activePanel = panel;
+                updatePanelVisuals(panel);
+            }
+
             closePlayerSelectionModal();
             updateDisplay();
+            updateJerseyDisplays();
             
             // Clear stat category selection
             document.querySelectorAll('.stat-button').forEach(btn => btn.classList.remove('active'));
@@ -1884,12 +1994,12 @@
             
             panelAEl.classList.remove('panel-active');
             panelAEl.classList.add('panel-inactive');
-            panelAEl.onclick = () => activatePanel('A');
+            panelAEl.onclick = () => activatePanelKeepPlayer('A');
             panelAEl.style.background = 'linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%)';
             
             panelBEl.classList.remove('panel-active');
             panelBEl.classList.add('panel-inactive');
-            panelBEl.onclick = () => activatePanel('B');
+            panelBEl.onclick = () => activatePanelKeepPlayer('B');
             panelBEl.style.background = 'linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%)';
 
             // Initialize stats for any players that don't have them
@@ -2024,14 +2134,41 @@
                 panelA.player ? `#${panelA.player.jersey} ${panelA.player.name}` : 'None';
             document.getElementById('selectedStatDisplayA').textContent = 
                 panelA.stat ? formatStatName(panelA.stat) : 'None';
+            
+            // Update Panel A header
+            document.getElementById('panelHeaderA').textContent = 
+                panelA.player ? panelA.player.name : 'Select Player';
 
             // Panel B Display
             document.getElementById('selectedPlayerDisplayB').textContent = 
                 panelB.player ? `#${panelB.player.jersey} ${panelB.player.name}` : 'None';
             document.getElementById('selectedStatDisplayB').textContent = 
                 panelB.stat ? formatStatName(panelB.stat) : 'None';
+            
+            // Update Panel B header
+            document.getElementById('panelHeaderB').textContent = 
+                panelB.player ? panelB.player.name : 'Select Player';
 
             renderActionButtons();
+            updateJerseyDisplays();
+        }
+
+        function updateJerseyDisplays() {
+            // Update Panel A jersey
+            const jerseyA = document.querySelector('#jerseyDisplayA .jersey-number');
+            if (panelA.player) {
+                jerseyA.textContent = panelA.player.jersey;
+            } else {
+                jerseyA.textContent = '--';
+            }
+
+            // Update Panel B jersey
+            const jerseyB = document.querySelector('#jerseyDisplayB .jersey-number');
+            if (panelB.player) {
+                jerseyB.textContent = panelB.player.jersey;
+            } else {
+                jerseyB.textContent = '--';
+            }
         }
 
         function renderActionButtons() {
@@ -2156,32 +2293,7 @@
         function updatePanelActiveState(panelId) {
             // After recording, the panel that just recorded becomes/stays active
             activePanel = panelId;
-            
-            // Update visual state to ensure this panel is active
-            const panelAEl = document.getElementById('panelA');
-            const panelBEl = document.getElementById('panelB');
-            
-            if (panelId === 'A') {
-                panelAEl.classList.remove('panel-inactive');
-                panelAEl.classList.add('panel-active');
-                panelAEl.onclick = null;
-                panelAEl.style.background = 'linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%)';
-                
-                panelBEl.classList.remove('panel-active');
-                panelBEl.classList.add('panel-inactive');
-                panelBEl.onclick = () => activatePanel('B');
-                panelBEl.style.background = 'linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%)';
-            } else {
-                panelBEl.classList.remove('panel-inactive');
-                panelBEl.classList.add('panel-active');
-                panelBEl.onclick = null;
-                panelBEl.style.background = 'linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%)';
-                
-                panelAEl.classList.remove('panel-active');
-                panelAEl.classList.add('panel-inactive');
-                panelAEl.onclick = () => activatePanel('A');
-                panelAEl.style.background = 'linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%)';
-            }
+            updatePanelVisuals(panelId);
         }
 
         function renderPlayLog() {
