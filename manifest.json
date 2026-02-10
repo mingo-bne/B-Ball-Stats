@@ -1,6 +1,6 @@
 {
-  "name": "Basketball Stats Tracker",
-  "short_name": "Stats Tracker",
+  "name": "CourtSide Stats",
+  "short_name": "CourtSide",
   "description": "Professional basketball statistics tracking tool for play-by-play game recording",
   "start_url": "/basketball-stats-tracker.html",
   "display": "standalone",

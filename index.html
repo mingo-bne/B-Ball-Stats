@@ -94,30 +94,31 @@
 
         .game-info {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
         }
 
         .game-info select,
-        .game-info input {
-            padding: 8px 12px;
+        .game-info input,
+        .game-info button {
+            padding: 10px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             font-size: 14px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         #teamSelector {
-            min-width: 200px;
             background: white;
             cursor: pointer;
         }
 
         #newTeamBtn {
-            padding: 8px 16px;
             background: #4CAF50;
             color: white;
             border: none;
-            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
@@ -1165,19 +1166,27 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏀 Basketball Stats Tracker</h1>
+            <h1>🏀 CourtSide Stats</h1>
             <div class="game-info">
-                <select id="teamSelector" onchange="switchTeam()">
-                    <option value="">Select Team...</option>
-                </select>
-                <button id="newTeamBtn" onclick="showNewTeamModal()">+ New Team</button>
-                <select id="gameSelector" onchange="switchGame()" style="min-width: 200px; display: none;">
-                    <option value="">Select Game...</option>
-                </select>
-                <button id="newGameBtn" onclick="startNewGame()" style="display: none;">+ New Game</button>
-                <button id="endGameBtn" onclick="endCurrentGame()" style="display: none; background: #f44336;">End Game</button>
-                <input type="text" id="opponent" placeholder="vs Opponent">
-                <input type="date" id="gameDate">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                    <select id="teamSelector" onchange="switchTeam()" style="width: 100%;">
+                        <option value="">Select Team...</option>
+                    </select>
+                    <button id="newTeamBtn" onclick="showNewTeamModal()" style="width: 100%;">+ New Team</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
+                    <select id="gameSelector" onchange="switchGame()" style="min-width: 0; width: 100%; display: none;">
+                        <option value="">Select Game...</option>
+                    </select>
+                    <button id="newGameBtn" onclick="startNewGame()" style="width: 100%; display: none;">+ New Game</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
+                    <button id="endGameBtn" onclick="endCurrentGame()" style="display: none; background: #f44336; width: 100%;">End Game</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
+                    <input type="text" id="opponent" placeholder="vs Opponent" style="width: 100%;">
+                    <input type="date" id="gameDate" style="width: 100%;">
+                </div>
             </div>
         </div>
 
