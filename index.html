@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Stats Tracker">
@@ -36,6 +36,7 @@
 
         html {
             scroll-behavior: smooth;
+            touch-action: manipulation;
         }
 
         body {
@@ -46,6 +47,7 @@
             padding: 0;
             margin: 0;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         /* Apple-style Glassmorphism */
@@ -143,10 +145,7 @@
         }
 
         .main-content {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 15px;
-            align-items: start;
+            display: block;
             width: 100%;
             box-sizing: border-box;
         }
@@ -1002,19 +1001,6 @@
                 border-radius: 16px;
             }
 
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .roster-panel {
-                position: relative;
-                top: 0;
-                max-height: 400px;
-                padding: 10px !important;
-                border-radius: 16px;
-            }
-
             .quick-entry {
                 position: sticky;
                 top: 0;
@@ -1203,53 +1189,41 @@
 <body>
     <div class="main-container">
         <div class="header">
-            <h1>🏀 CourtSide Stats</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
+                <h1>🏀 CourtSide Stats</h1>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="showTeamsModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">🏀 Teams</button>
+                    <button onclick="showGamesModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">🏆 Games</button>
+                    <button onclick="showRosterModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">👥 Roster</button>
+                </div>
+            </div>
             <div class="game-info">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%;">
                     <select id="teamSelector" onchange="switchTeam()" style="width: 100%;">
-                        <option value="">Select Team...</option>
+                        <option value="">Select My Team...</option>
                     </select>
-                    <button id="newTeamBtn" onclick="showNewTeamModal()" style="width: 100%;">+ New Team</button>
+                    <select id="opponentSelector" style="width: 100%;">
+                        <option value="">Select Opponent...</option>
+                    </select>
+                    <input type="date" id="gameDate" style="width: 100%;">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
-                    <select id="gameSelector" onchange="switchGame()" style="min-width: 0; width: 100%; display: none;">
+                    <button onclick="quickCreateGame()" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ New Game</button>
+                    <select id="gameSelector" onchange="switchGame()" style="width: 100%; display: none;">
                         <option value="">Select Game...</option>
                     </select>
-                    <button id="newGameBtn" onclick="startNewGame()" style="width: 100%; display: none;">+ New Game</button>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
-                    <button id="endGameBtn" onclick="endCurrentGame()" style="display: none; background: #f44336; width: 100%;">End Game</button>
-                </div>
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
-                    <input type="text" id="opponent" placeholder="vs Opponent" style="width: 100%;">
-                    <input type="date" id="gameDate" style="width: 100%;">
                 </div>
             </div>
         </div>
 
         <div class="main-content">
-            <div class="roster-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;">
-                    <h2 style="margin: 0;">Roster</h2>
-                    <button onclick="showManageTeamsModal()" style="padding: 6px 12px; background: #1e3c72; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;">Manage Teams</button>
-                </div>
-                <div class="add-player">
-                    <div class="add-player-row">
-                        <input type="number" id="jerseyInput" placeholder="#" min="0" max="99">
-                        <input type="text" id="nameInput" placeholder="Player Name">
-                    </div>
-                    <button onclick="addPlayer()">Add Player</button>
-                </div>
-                <div class="player-list" id="playerList"></div>
-            </div>
-
             <div class="tracking-panel">
                 <!-- Dual Quick Entry Panels - Active/Inactive Toggle -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100;">
                     <!-- Panel A - RGB(24, 40, 73) -->
                     <div class="quick-entry panel-inactive" id="panelA" onclick="activatePanelKeepPlayer('A')" style="background: linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%);">
                         <div class="panel-status"></div>
-                        <h3 id="panelHeaderA" style="margin-bottom: 10px;">Select Player</h3>
+                        <h3 id="panelHeaderA" style="margin-bottom: 10px; padding-top: 25px;">Select Player</h3>
                         <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
                             <div class="current-selection" id="currentSelectionA" style="flex: 1; margin-bottom: 0;">
                                 <div><strong>Player:</strong> <span id="selectedPlayerDisplayA">None</span></div>
@@ -1265,7 +1239,7 @@
                     <!-- Panel B - RGB(241, 189, 66) -->
                     <div class="quick-entry panel-inactive" id="panelB" onclick="activatePanelKeepPlayer('B')" style="background: linear-gradient(135deg, rgb(241, 189, 66) 0%, rgb(251, 199, 76) 100%);">
                         <div class="panel-status"></div>
-                        <h3 id="panelHeaderB" style="margin-bottom: 10px;">Select Player</h3>
+                        <h3 id="panelHeaderB" style="margin-bottom: 10px; padding-top: 25px;">Select Player</h3>
                         <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
                             <div class="current-selection" id="currentSelectionB" style="flex: 1; margin-bottom: 0;">
                                 <div><strong>Player:</strong> <span id="selectedPlayerDisplayB">None</span></div>
@@ -1436,8 +1410,159 @@
         </div>
     </div>
 
+    <!-- Teams Management Modal -->
+    <div id="teamsModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Teams & Opponents</h2>
+                <button class="close-modal" onclick="closeTeamsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #1e3c72; margin-bottom: 15px;">My Teams</h3>
+                    <div style="margin-bottom: 15px;">
+                        <button onclick="showAddTeamForm()" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Add New Team</button>
+                    </div>
+                    <div id="myTeamsListContainer" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
+                <div>
+                    <h3 style="color: #1e3c72; margin-bottom: 15px;">Opponents</h3>
+                    <div style="margin-bottom: 15px;">
+                        <button onclick="showAddOpponentForm()" style="width: 100%; padding: 12px; background: #FF9800; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Add New Opponent</button>
+                    </div>
+                    <div id="opponentsListContainer" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="closeTeamsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Team Modal -->
+    <div id="addTeamModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="teamFormTitle">Add Team</h2>
+                <button class="close-modal" onclick="closeAddTeamModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Team Name</label>
+                    <input type="text" id="teamNameInput" placeholder="Team Name" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Team Color</label>
+                    <input type="color" id="teamColorInput" value="#1e3c72" style="width: 100%; height: 50px; padding: 5px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box; cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="saveTeam()">Save Team</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeAddTeamModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Opponent Modal -->
+    <div id="addOpponentModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="opponentFormTitle">Add Opponent</h2>
+                <button class="close-modal" onclick="closeAddOpponentModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Opponent Name</label>
+                    <input type="text" id="opponentNameInput" placeholder="Opponent Name" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="saveOpponent()">Save Opponent</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeAddOpponentModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roster Management Modal -->
+    <div id="rosterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Roster Management</h2>
+                <button class="close-modal" onclick="closeRosterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #1e3c72;">Current Roster</h3>
+                    <button onclick="showManageTeamsModal()" style="padding: 6px 12px; background: #1e3c72; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Manage Teams</button>
+                </div>
+                <div class="add-player">
+                    <div class="add-player-row">
+                        <input type="number" id="jerseyInput" placeholder="#" min="0" max="99">
+                        <input type="text" id="nameInput" placeholder="Player Name">
+                    </div>
+                    <button onclick="addPlayer()">Add Player</button>
+                </div>
+                <div class="player-list" id="playerList" style="max-height: 400px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="closeRosterModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Games Management Modal -->
+    <div id="gamesModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Games Management</h2>
+                <button class="close-modal" onclick="closeGamesModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <button onclick="startNewGameFromModal()" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Create New Game</button>
+                </div>
+                <div id="gamesListContainer" style="max-height: 500px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="closeGamesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Game Modal -->
+    <div id="editGameModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Edit Game</h2>
+                <button class="close-modal" onclick="closeEditGameModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Opponent</label>
+                    <input type="text" id="editOpponent" placeholder="Opponent Name" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Game Date</label>
+                    <input type="date" id="editGameDate" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Status</label>
+                    <select id="editGameStatus" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
+                        <option value="active">Active (Can add stats)</option>
+                        <option value="ended">Ended (Locked)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="saveGameEdit()">Save Changes</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeEditGameModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let teams = {};
+        let opponents = []; // List of opponent names
         let currentTeamId = null;
         let currentGameId = null;
         let players = [];
@@ -1634,7 +1759,7 @@
             playLog = game.playLog || [];
             stats = game.stats || {};
             
-            document.getElementById('opponent').value = game.opponent || '';
+            document.getElementById('opponentSelector').value = game.opponent || '';
             document.getElementById('gameDate').value = game.date || '';
 
             // Check if game is ended
@@ -1659,7 +1784,7 @@
 
             game.playLog = playLog;
             game.stats = stats;
-            game.opponent = document.getElementById('opponent').value;
+            game.opponent = document.getElementById('opponentSelector').value;
             game.date = document.getElementById('gameDate').value;
 
             saveAllData();
@@ -1784,6 +1909,545 @@
             document.getElementById('playerSelectionModal').style.display = 'none';
         }
 
+        function showRosterModal() {
+            if (!currentTeamId) {
+                alert('Please select a team first');
+                return;
+            }
+            document.getElementById('rosterModal').style.display = 'block';
+            renderPlayers(); // Refresh the player list
+        }
+
+        function closeRosterModal() {
+            document.getElementById('rosterModal').style.display = 'none';
+        }
+
+        // Games Management Functions
+        let editingGameId = null;
+
+        function showGamesModal() {
+            if (!currentTeamId) {
+                alert('Please select a team first');
+                return;
+            }
+            document.getElementById('gamesModal').style.display = 'block';
+            renderGamesList();
+        }
+
+        function closeGamesModal() {
+            document.getElementById('gamesModal').style.display = 'none';
+        }
+
+        function renderGamesList() {
+            const team = teams[currentTeamId];
+            const games = team.games || [];
+            const container = document.getElementById('gamesListContainer');
+
+            if (games.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">No games yet. Create your first game!</div>';
+                return;
+            }
+
+            container.innerHTML = games.map(game => {
+                const statusBadge = game.isActive 
+                    ? '<span style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ACTIVE</span>'
+                    : '<span style="background: #999; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ENDED</span>';
+                
+                const isCurrentGame = game.id === currentGameId;
+                const currentBadge = isCurrentGame ? '<span style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 5px;">CURRENT</span>' : '';
+                
+                const dateStr = game.date ? new Date(game.date).toLocaleDateString() : 'No date';
+                const opponent = game.opponent || 'No opponent';
+                
+                const totalPlays = game.playLog ? game.playLog.length : 0;
+                
+                return `
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: ${isCurrentGame ? '2px solid #2196F3' : '1px solid #e0e0e0'};">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600; color: #1e3c72; margin-bottom: 5px;">
+                                    ${dateStr} vs ${opponent}
+                                </div>
+                                <div style="font-size: 13px; color: #666;">
+                                    ${totalPlays} plays recorded
+                                </div>
+                            </div>
+                            <div>
+                                ${statusBadge}
+                                ${currentBadge}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button onclick="loadGame('${game.id}')" style="padding: 6px 12px; background: #2196F3; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                📊 Load Game
+                            </button>
+                            <button onclick="editGame('${game.id}')" style="padding: 6px 12px; background: #FF9800; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="duplicateGame('${game.id}')" style="padding: 6px 12px; background: #9C27B0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                📋 Duplicate
+                            </button>
+                            <button onclick="deleteGame('${game.id}')" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startNewGameFromModal() {
+            startNewGame();
+            closeGamesModal();
+        }
+
+        function loadGame(gameId) {
+            switchToGame(gameId);
+            closeGamesModal();
+        }
+
+        function switchToGame(gameId) {
+            // Save current game first
+            if (currentGameId) {
+                saveCurrentGameData();
+            }
+
+            currentGameId = gameId;
+            loadGameData(gameId);
+            renderGameSelector();
+        }
+
+        function editGame(gameId) {
+            editingGameId = gameId;
+            const team = teams[currentTeamId];
+            const game = team.games.find(g => g.id === gameId);
+            
+            if (!game) return;
+
+            document.getElementById('editOpponent').value = game.opponent || '';
+            document.getElementById('editGameDate').value = game.date || '';
+            document.getElementById('editGameStatus').value = game.isActive ? 'active' : 'ended';
+            
+            document.getElementById('editGameModal').style.display = 'block';
+        }
+
+        function closeEditGameModal() {
+            document.getElementById('editGameModal').style.display = 'none';
+            editingGameId = null;
+        }
+
+        function saveGameEdit() {
+            if (!editingGameId) return;
+
+            const team = teams[currentTeamId];
+            const game = team.games.find(g => g.id === editingGameId);
+            
+            if (!game) return;
+
+            game.opponent = document.getElementById('editOpponent').value;
+            game.date = document.getElementById('editGameDate').value;
+            const newStatus = document.getElementById('editGameStatus').value === 'active';
+            
+            // If changing from ended to active, clear endTime
+            if (!game.isActive && newStatus) {
+                game.endTime = null;
+            }
+            // If changing from active to ended, set endTime
+            if (game.isActive && !newStatus) {
+                game.endTime = new Date().toISOString();
+            }
+            
+            game.isActive = newStatus;
+
+            saveAllData();
+            
+            // If editing current game, update the UI
+            if (editingGameId === currentGameId) {
+                document.getElementById('opponent').value = game.opponent;
+                document.getElementById('gameDate').value = game.date;
+                
+                if (game.isActive) {
+                    enableStatEntry();
+                } else {
+                    disableStatEntry();
+                }
+                
+                renderGameSelector();
+            }
+
+            closeEditGameModal();
+            renderGamesList();
+        }
+
+        function duplicateGame(gameId) {
+            if (!confirm('Duplicate this game? This will create a new game with the same matchup and date.')) {
+                return;
+            }
+
+            const team = teams[currentTeamId];
+            const originalGame = team.games.find(g => g.id === gameId);
+            
+            if (!originalGame) return;
+
+            const newGameId = 'game_' + Date.now();
+            const newGame = {
+                id: newGameId,
+                opponent: originalGame.opponent,
+                date: originalGame.date,
+                startTime: new Date().toISOString(),
+                endTime: null,
+                isActive: true,
+                playLog: [], // Start fresh
+                stats: {}
+            };
+
+            // Initialize stats for all players
+            team.players.forEach(player => {
+                const key = `${player.jersey}-${player.name}`;
+                newGame.stats[key] = initPlayerStats();
+            });
+
+            team.games.push(newGame);
+            saveAllData();
+            renderGamesList();
+            
+            alert('Game duplicated! The new game is now active.');
+        }
+
+        function deleteGame(gameId) {
+            if (!confirm('Delete this game? This action cannot be undone. All stats and play-by-play data will be lost.')) {
+                return;
+            }
+
+            const team = teams[currentTeamId];
+            const gameIndex = team.games.findIndex(g => g.id === gameId);
+            
+            if (gameIndex === -1) return;
+
+            team.games.splice(gameIndex, 1);
+            
+            // If deleting current game, clear the session
+            if (gameId === currentGameId) {
+                currentGameId = null;
+                playLog = [];
+                stats = {};
+                
+                // Initialize stats for all players
+                team.players.forEach(player => {
+                    const key = `${player.jersey}-${player.name}`;
+                    stats[key] = initPlayerStats();
+                });
+                
+                updateDisplay();
+                renderPlayLog();
+                renderStats();
+            }
+
+            saveAllData();
+            renderGameSelector();
+            renderOpponentSelector();
+            renderGamesList();
+        }
+
+        // Teams and Opponents Management
+        let editingTeamId = null;
+        let editingOpponentIndex = null;
+
+        function showTeamsModal() {
+            document.getElementById('teamsModal').style.display = 'block';
+            renderMyTeamsList();
+            renderOpponentsList();
+        }
+
+        function closeTeamsModal() {
+            document.getElementById('teamsModal').style.display = 'none';
+        }
+
+        function renderMyTeamsList() {
+            const container = document.getElementById('myTeamsListContainer');
+            const teamList = Object.values(teams);
+
+            if (teamList.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">No teams yet. Add your first team!</div>';
+                return;
+            }
+
+            container.innerHTML = teamList.map(team => {
+                const isCurrentTeam = team.id === currentTeamId;
+                const gamesCount = team.games ? team.games.length : 0;
+                const playersCount = team.players ? team.players.length : 0;
+
+                return `
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: ${isCurrentTeam ? '2px solid #2196F3' : '1px solid #e0e0e0'};">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <div style="width: 20px; height: 20px; border-radius: 50%; background: ${team.color || '#1e3c72'};"></div>
+                                    <div style="font-size: 16px; font-weight: 600; color: #1e3c72;">
+                                        ${team.name}
+                                    </div>
+                                    ${isCurrentTeam ? '<span style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ACTIVE</span>' : ''}
+                                </div>
+                                <div style="font-size: 13px; color: #666;">
+                                    ${playersCount} players • ${gamesCount} games
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${!isCurrentTeam ? `<button onclick="setActiveTeam('${team.id}')" style="padding: 6px 12px; background: #2196F3; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                ✓ Set Active
+                            </button>` : ''}
+                            <button onclick="editTeam('${team.id}')" style="padding: 6px 12px; background: #FF9800; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="deleteTeam('${team.id}')" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderOpponentsList() {
+            const container = document.getElementById('opponentsListContainer');
+
+            if (opponents.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">No opponents yet. Add your first opponent!</div>';
+                return;
+            }
+
+            container.innerHTML = opponents.map((opponent, index) => {
+                return `
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 16px; font-weight: 600; color: #1e3c72;">
+                            ${opponent}
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editOpponent(${index})" style="padding: 6px 12px; background: #FF9800; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="deleteOpponent(${index})" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showAddTeamForm() {
+            editingTeamId = null;
+            document.getElementById('teamFormTitle').textContent = 'Add Team';
+            document.getElementById('teamNameInput').value = '';
+            document.getElementById('teamColorInput').value = '#1e3c72';
+            document.getElementById('addTeamModal').style.display = 'block';
+        }
+
+        function closeAddTeamModal() {
+            document.getElementById('addTeamModal').style.display = 'none';
+            editingTeamId = null;
+        }
+
+        function editTeam(teamId) {
+            editingTeamId = teamId;
+            const team = teams[teamId];
+            document.getElementById('teamFormTitle').textContent = 'Edit Team';
+            document.getElementById('teamNameInput').value = team.name;
+            document.getElementById('teamColorInput').value = team.color || '#1e3c72';
+            document.getElementById('addTeamModal').style.display = 'block';
+        }
+
+        function saveTeam() {
+            const teamName = document.getElementById('teamNameInput').value.trim();
+            const teamColor = document.getElementById('teamColorInput').value;
+
+            if (!teamName) {
+                alert('Please enter a team name');
+                return;
+            }
+
+            if (editingTeamId) {
+                // Editing existing team
+                teams[editingTeamId].name = teamName;
+                teams[editingTeamId].color = teamColor;
+            } else {
+                // Creating new team
+                const teamId = 'team_' + Date.now();
+                teams[teamId] = {
+                    id: teamId,
+                    name: teamName,
+                    color: teamColor,
+                    created: new Date().toISOString(),
+                    players: [],
+                    games: []
+                };
+            }
+
+            saveAllData();
+            renderTeamSelector();
+            renderMyTeamsList();
+            closeAddTeamModal();
+        }
+
+        function setActiveTeam(teamId) {
+            switchTeam(teamId);
+            closeTeamsModal();
+        }
+
+        function deleteTeam(teamId) {
+            if (!confirm('Delete this team? This will delete all games, players, and stats for this team. This cannot be undone.')) {
+                return;
+            }
+
+            delete teams[teamId];
+
+            if (currentTeamId === teamId) {
+                currentTeamId = null;
+                currentGameId = null;
+                players = [];
+                playLog = [];
+                stats = {};
+                document.getElementById('teamSelector').value = '';
+                updateDisplay();
+                renderPlayLog();
+                renderStats();
+            }
+
+            saveAllData();
+            renderTeamSelector();
+            renderMyTeamsList();
+        }
+
+        function showAddOpponentForm() {
+            editingOpponentIndex = null;
+            document.getElementById('opponentFormTitle').textContent = 'Add Opponent';
+            document.getElementById('opponentNameInput').value = '';
+            document.getElementById('addOpponentModal').style.display = 'block';
+        }
+
+        function closeAddOpponentModal() {
+            document.getElementById('addOpponentModal').style.display = 'none';
+            editingOpponentIndex = null;
+        }
+
+        function editOpponent(index) {
+            editingOpponentIndex = index;
+            document.getElementById('opponentFormTitle').textContent = 'Edit Opponent';
+            document.getElementById('opponentNameInput').value = opponents[index];
+            document.getElementById('addOpponentModal').style.display = 'block';
+        }
+
+        function saveOpponent() {
+            const opponentName = document.getElementById('opponentNameInput').value.trim();
+
+            if (!opponentName) {
+                alert('Please enter an opponent name');
+                return;
+            }
+
+            if (editingOpponentIndex !== null) {
+                opponents[editingOpponentIndex] = opponentName;
+            } else {
+                opponents.push(opponentName);
+            }
+
+            saveAllData();
+            renderOpponentSelector();
+            renderOpponentsList();
+            closeAddOpponentModal();
+        }
+
+        function deleteOpponent(index) {
+            if (!confirm('Delete this opponent? This will not delete any games.')) {
+                return;
+            }
+
+            opponents.splice(index, 1);
+            saveAllData();
+            renderOpponentSelector();
+            renderOpponentsList();
+        }
+
+        function renderOpponentSelector() {
+            const selector = document.getElementById('opponentSelector');
+            selector.innerHTML = '<option value="">Select Opponent...</option>' +
+                opponents.map(opp => `<option value="${opp}">${opp}</option>`).join('');
+        }
+
+        function quickCreateGame() {
+            if (!currentTeamId) {
+                alert('Please select your team first');
+                return;
+            }
+
+            const opponent = document.getElementById('opponentSelector').value;
+            const date = document.getElementById('gameDate').value;
+
+            if (!opponent) {
+                alert('Please select an opponent');
+                return;
+            }
+
+            if (!date) {
+                alert('Please select a game date');
+                return;
+            }
+
+            // Create new game
+            const gameId = 'game_' + Date.now();
+            const team = teams[currentTeamId];
+            
+            if (!team.games) team.games = [];
+            
+            const newGame = {
+                id: gameId,
+                opponent: opponent,
+                date: date,
+                startTime: new Date().toISOString(),
+                endTime: null,
+                isActive: true,
+                playLog: [],
+                stats: {}
+            };
+
+            // Initialize stats for all players
+            team.players.forEach(player => {
+                const key = `${player.jersey}-${player.name}`;
+                newGame.stats[key] = initPlayerStats();
+            });
+
+            team.games.push(newGame);
+            currentGameId = gameId;
+            
+            // Load the new game
+            playLog = [];
+            stats = newGame.stats;
+            
+            saveAllData();
+            renderGameSelector();
+            updateDisplay();
+            renderPlayLog();
+            renderStats();
+
+            alert(`New game created: ${team.name} vs ${opponent} on ${new Date(date).toLocaleDateString()}`);
+        }
+
+        function switchTeam(teamId) {
+            if (!teamId) teamId = document.getElementById('teamSelector').value;
+            if (!teamId) return;
+
+            // Save current team data if exists
+            if (currentTeamId) {
+                saveCurrentTeamData();
+            }
+
+            currentTeamId = teamId;
+            loadTeamData(teamId);
+            renderGameSelector();
+            renderOpponentSelector();
+        }
+
         function selectPlayerForActivePanel(jersey) {
             const player = players.find(p => p.jersey === jersey);
             if (!player) return;
@@ -1817,6 +2481,7 @@
         function initApp() {
             loadAllData();
             renderTeamSelector();
+            renderOpponentSelector();
             if (currentTeamId) {
                 loadTeamData(currentTeamId);
                 renderGameSelector();
@@ -2493,6 +3158,7 @@
         function saveAllData() {
             localStorage.setItem('basketballTeams', JSON.stringify({
                 teams: teams,
+                opponents: opponents,
                 currentTeamId: currentTeamId,
                 currentGameId: currentGameId
             }));
@@ -2504,11 +3170,13 @@
                 try {
                     const data = JSON.parse(saved);
                     teams = data.teams || {};
+                    opponents = data.opponents || [];
                     currentTeamId = data.currentTeamId || null;
                     currentGameId = data.currentGameId || null;
                 } catch (e) {
                     console.error('Error loading saved data', e);
                     teams = {};
+                    opponents = [];
                     currentTeamId = null;
                     currentGameId = null;
                 }
@@ -2516,11 +3184,23 @@
         }
 
         // Auto-save on game info changes
-        document.getElementById('opponent').addEventListener('input', () => {
-            if (currentGameId) saveCurrentGameData();
+        document.getElementById('opponentSelector').addEventListener('change', () => {
+            if (currentGameId) {
+                const game = teams[currentTeamId].games.find(g => g.id === currentGameId);
+                if (game) {
+                    game.opponent = document.getElementById('opponentSelector').value;
+                    saveAllData();
+                }
+            }
         });
         document.getElementById('gameDate').addEventListener('change', () => {
-            if (currentGameId) saveCurrentGameData();
+            if (currentGameId) {
+                const game = teams[currentTeamId].games.find(g => g.id === currentGameId);
+                if (game) {
+                    game.date = document.getElementById('gameDate').value;
+                    saveAllData();
+                }
+            }
         });
 
         // Initialize app on load
