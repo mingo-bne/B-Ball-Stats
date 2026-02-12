@@ -1018,6 +1018,23 @@
                 overflow: hidden;
             }
 
+            /* Make header buttons smaller on mobile */
+            .header button {
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+            }
+
+            /* Adjust team/opponent/date grid on mobile */
+            .game-info > div:first-child {
+                gap: 6px !important;
+            }
+
+            .game-info select,
+            .game-info input[type="date"] {
+                font-size: 13px !important;
+                padding: 8px !important;
+            }
+
             .tracking-panel {
                 padding: 10px !important;
                 overflow-x: hidden;
@@ -1228,23 +1245,23 @@
 <body>
     <div class="main-container">
         <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; box-sizing: border-box; flex-wrap: wrap;">
                 <h1>🏀 CourtSide Stats</h1>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
                     <button onclick="showTeamsModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">🏀 Teams</button>
                     <button onclick="showGamesModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">🏆 Games</button>
                     <button onclick="showRosterModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;">👥 Roster</button>
                 </div>
             </div>
             <div class="game-info">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%;">
-                    <select id="teamSelector" onchange="switchTeam()" style="width: 100%;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box;">
+                    <select id="teamSelector" onchange="switchTeam()" style="width: 100%; box-sizing: border-box;">
                         <option value="">Select My Team...</option>
                     </select>
-                    <select id="opponentSelector" style="width: 100%;">
+                    <select id="opponentSelector" style="width: 100%; box-sizing: border-box;">
                         <option value="">Select Opponent...</option>
                     </select>
-                    <input type="date" id="gameDate" style="width: 100%;">
+                    <input type="date" id="gameDate" style="width: 100%; box-sizing: border-box;">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; margin-top: 8px;">
                     <button id="newGameBtn" onclick="quickCreateGame()" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: none;">+ New Game</button>
@@ -3286,12 +3303,22 @@
         window.addEventListener('load', initApp);
 
         // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
+        const isLocalhost = Boolean(
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '[::1]' ||
+            window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+        );
+        
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || isLocalhost)) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed'));
+                    .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+                    .catch(err => {
+                        console.log('⚠️ Service Worker registration failed:', err.message);
+                    });
             });
+        } else if ('serviceWorker' in navigator) {
+            console.log('ℹ️ Service Worker not registered - HTTPS or localhost required for PWA features');
         }
 
         // PWA Install Prompt
