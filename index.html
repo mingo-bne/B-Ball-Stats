@@ -300,6 +300,9 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .stat-categories {
@@ -389,6 +392,9 @@
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .panel-active {
@@ -1009,6 +1015,12 @@
             .header {
                 padding: 10px !important;
                 border-radius: 16px;
+                overflow: hidden;
+            }
+
+            .tracking-panel {
+                padding: 10px !important;
+                overflow-x: hidden;
             }
 
             .quick-entry {
@@ -1016,11 +1028,28 @@
                 top: 0;
                 padding: 10px !important;
                 border-radius: 16px;
+                overflow: hidden;
             }
 
             .tracking-panel > div:first-child {
                 grid-template-columns: 1fr;
                 gap: 10px;
+            }
+
+            /* Reduce gap on mobile for panels side by side */
+            .tracking-panel > div:first-child {
+                gap: 8px !important;
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            /* Make jersey display smaller on mobile */
+            .jersey-display {
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .jersey-number {
+                font-size: 36px !important;
             }
 
             .stat-categories {
@@ -1232,7 +1261,7 @@
         <div class="main-content">
             <div class="tracking-panel">
                 <!-- Dual Quick Entry Panels - Active/Inactive Toggle -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; width: 100%; box-sizing: border-box; overflow: hidden;">
                     <!-- Panel A - RGB(24, 40, 73) -->
                     <div class="quick-entry panel-inactive" id="panelA" onclick="activatePanelKeepPlayer('A')" style="background: linear-gradient(135deg, rgb(24, 40, 73) 0%, rgb(34, 50, 83) 100%);">
                         <div class="panel-status"></div>
@@ -1824,6 +1853,9 @@
             const currentGameText = document.getElementById('currentGameText');
             const endGameBtn = document.getElementById('endGameBtn');
             
+            // Always hide end game button first
+            if (endGameBtn) endGameBtn.style.display = 'none';
+            
             if (!currentTeamId) {
                 newGameBtn.style.display = 'none';
                 currentGameDisplay.style.display = 'none';
@@ -1844,8 +1876,11 @@
                     currentGameDisplay.style.display = 'block';
                     newGameBtn.style.display = 'none';
                     
-                    // Show end game button only if game is active
-                    if (game.isActive) {
+                    // Show end game button ONLY if game is active AND has plays
+                    if (game.isActive && playLog && playLog.length > 0) {
+                        endGameBtn.style.display = 'block';
+                    } else if (game.isActive) {
+                        // Active but no plays yet - still show end game button
                         endGameBtn.style.display = 'block';
                     } else {
                         endGameBtn.style.display = 'none';
@@ -3238,6 +3273,14 @@
                 }
             }
         });
+
+        // Make modal functions globally accessible
+        window.showTeamsModal = showTeamsModal;
+        window.showGamesModal = showGamesModal;
+        window.showRosterModal = showRosterModal;
+        window.closeTeamsModal = closeTeamsModal;
+        window.closeGamesModal = closeGamesModal;
+        window.closeRosterModal = closeRosterModal;
 
         // Initialize app on load
         window.addEventListener('load', initApp);
