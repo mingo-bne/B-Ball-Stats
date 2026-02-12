@@ -738,17 +738,22 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             animation: fadeIn 0.3s;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-content {
             background-color: white;
-            margin: 10% auto;
+            margin: 50px auto;
             padding: 30px;
             border-radius: 12px;
             width: 90%;
             max-width: 500px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             animation: slideIn 0.3s;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            position: relative;
         }
 
         .modal-header {
@@ -781,6 +786,8 @@
 
         .modal-body {
             margin-bottom: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .form-group {
@@ -915,6 +922,7 @@
             gap: 10px;
             max-height: 400px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .player-select-btn {
@@ -981,9 +989,11 @@
 
         @media (max-width: 768px) {
             .modal-content {
-                margin: 20% auto;
+                margin: 20px auto;
                 width: 95%;
                 padding: 20px;
+                max-height: calc(100vh - 40px);
+                overflow-y: auto;
             }
         }
 
@@ -1426,14 +1436,14 @@
                     <div style="margin-bottom: 15px;">
                         <button onclick="showAddTeamForm()" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Add New Team</button>
                     </div>
-                    <div id="myTeamsListContainer" style="max-height: 300px; overflow-y: auto;"></div>
+                    <div id="myTeamsListContainer" style="max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
                 </div>
                 <div>
                     <h3 style="color: #1e3c72; margin-bottom: 15px;">Opponents</h3>
                     <div style="margin-bottom: 15px;">
                         <button onclick="showAddOpponentForm()" style="width: 100%; padding: 12px; background: #FF9800; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Add New Opponent</button>
                     </div>
-                    <div id="opponentsListContainer" style="max-height: 300px; overflow-y: auto;"></div>
+                    <div id="opponentsListContainer" style="max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
                 </div>
             </div>
             <div class="modal-actions">
@@ -1505,7 +1515,7 @@
                     </div>
                     <button onclick="addPlayer()">Add Player</button>
                 </div>
-                <div class="player-list" id="playerList" style="max-height: 400px; overflow-y: auto;"></div>
+                <div class="player-list" id="playerList" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" onclick="closeRosterModal()">Close</button>
@@ -1524,7 +1534,7 @@
                 <div style="margin-bottom: 20px;">
                     <button onclick="startNewGameFromModal()" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">+ Create New Game</button>
                 </div>
-                <div id="gamesListContainer" style="max-height: 500px; overflow-y: auto;"></div>
+                <div id="gamesListContainer" style="max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" onclick="closeGamesModal()">Close</button>
