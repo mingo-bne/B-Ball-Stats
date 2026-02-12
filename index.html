@@ -1207,11 +1207,14 @@
                     </select>
                     <input type="date" id="gameDate" style="width: 100%;">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px;">
-                    <button onclick="quickCreateGame()" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ New Game</button>
-                    <select id="gameSelector" onchange="switchGame()" style="width: 100%; display: none;">
-                        <option value="">Select Game...</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; margin-top: 8px;">
+                    <button id="newGameBtn" onclick="quickCreateGame()" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: none;">+ New Game</button>
+                    <div id="currentGameDisplay" style="display: none;">
+                        <div style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; color: white; font-weight: 600; text-align: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 8px;">
+                            <span id="currentGameText"></span>
+                        </div>
+                        <button id="endGameBtn" onclick="endCurrentGame()" style="width: 100%; padding: 10px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: none;">🔒 End Game</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1694,37 +1697,52 @@
 
             saveAllData();
             
-            // Disable stat entry
-            alert('Game ended. Stats are now locked. Start a new game to continue tracking.');
-            
             // Disable all entry buttons
             disableStatEntry();
+            
+            // Update UI to show game is now ended
+            renderGameSelector();
+            
+            alert('Game ended. Stats are now locked.');
         }
 
         function disableStatEntry() {
             // Disable panels
-            document.getElementById('panelA').onclick = null;
-            document.getElementById('panelB').onclick = null;
-            document.getElementById('panelA').style.opacity = '0.5';
-            document.getElementById('panelB').style.opacity = '0.5';
+            const panelA = document.getElementById('panelA');
+            const panelB = document.getElementById('panelB');
+            panelA.classList.add('stat-entry-disabled');
+            panelB.classList.add('stat-entry-disabled');
+            panelA.style.opacity = '0.5';
+            panelB.style.opacity = '0.5';
+            panelA.style.pointerEvents = 'none';
+            panelB.style.pointerEvents = 'none';
             
             // Disable stat category buttons
             document.querySelectorAll('.stat-button').forEach(btn => {
-                btn.onclick = null;
+                btn.classList.add('stat-entry-disabled');
                 btn.style.opacity = '0.5';
                 btn.style.cursor = 'not-allowed';
+                btn.style.pointerEvents = 'none';
             });
         }
 
         function enableStatEntry() {
             // Re-enable panels
-            document.getElementById('panelA').style.opacity = '1';
-            document.getElementById('panelB').style.opacity = '1';
+            const panelA = document.getElementById('panelA');
+            const panelB = document.getElementById('panelB');
+            panelA.classList.remove('stat-entry-disabled');
+            panelB.classList.remove('stat-entry-disabled');
+            panelA.style.opacity = '1';
+            panelB.style.opacity = '1';
+            panelA.style.pointerEvents = 'auto';
+            panelB.style.pointerEvents = 'auto';
             
             // Re-enable stat category buttons
             document.querySelectorAll('.stat-button').forEach(btn => {
+                btn.classList.remove('stat-entry-disabled');
                 btn.style.opacity = '1';
                 btn.style.cursor = 'pointer';
+                btn.style.pointerEvents = 'auto';
             });
         }
 
@@ -1791,39 +1809,46 @@
         }
 
         function renderGameSelector() {
-            const selector = document.getElementById('gameSelector');
             const newGameBtn = document.getElementById('newGameBtn');
+            const currentGameDisplay = document.getElementById('currentGameDisplay');
+            const currentGameText = document.getElementById('currentGameText');
             const endGameBtn = document.getElementById('endGameBtn');
             
             if (!currentTeamId) {
-                selector.style.display = 'none';
                 newGameBtn.style.display = 'none';
-                endGameBtn.style.display = 'none';
+                currentGameDisplay.style.display = 'none';
                 return;
             }
-
-            selector.style.display = 'block';
-            newGameBtn.style.display = 'block';
 
             const team = teams[currentTeamId];
             const games = team.games || [];
 
-            selector.innerHTML = '<option value="">Select Game...</option>' +
-                games.map(game => {
-                    const status = game.isActive ? '🟢' : '🔴';
+            if (currentGameId) {
+                // Show current game info, hide new game button
+                const game = games.find(g => g.id === currentGameId);
+                if (game) {
+                    const status = game.isActive ? '🟢 ACTIVE' : '🔴 ENDED';
                     const dateStr = game.date ? new Date(game.date).toLocaleDateString() : 'No date';
                     const opponent = game.opponent || 'No opponent';
-                    return `<option value="${game.id}">${status} ${dateStr} vs ${opponent}</option>`;
-                }).join('');
-
-            if (currentGameId) {
-                selector.value = currentGameId;
-                const game = games.find(g => g.id === currentGameId);
-                if (game && game.isActive) {
-                    endGameBtn.style.display = 'block';
+                    currentGameText.textContent = `${status}: ${dateStr} vs ${opponent}`;
+                    currentGameDisplay.style.display = 'block';
+                    newGameBtn.style.display = 'none';
+                    
+                    // Show end game button only if game is active
+                    if (game.isActive) {
+                        endGameBtn.style.display = 'block';
+                    } else {
+                        endGameBtn.style.display = 'none';
+                    }
                 } else {
-                    endGameBtn.style.display = 'none';
+                    // Game not found, show new game button
+                    newGameBtn.style.display = 'block';
+                    currentGameDisplay.style.display = 'none';
                 }
+            } else {
+                // No current game, show new game button
+                newGameBtn.style.display = 'block';
+                currentGameDisplay.style.display = 'none';
             }
         }
 
@@ -2424,13 +2449,14 @@
             playLog = [];
             stats = newGame.stats;
             
+            // Enable stat entry since this is a new active game
+            enableStatEntry();
+            
             saveAllData();
             renderGameSelector();
             updateDisplay();
             renderPlayLog();
             renderStats();
-
-            alert(`New game created: ${team.name} vs ${opponent} on ${new Date(date).toLocaleDateString()}`);
         }
 
         function switchTeam(teamId) {
