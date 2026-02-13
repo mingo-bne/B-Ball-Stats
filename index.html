@@ -1024,9 +1024,15 @@
                 font-size: 12px !important;
             }
 
-            /* Adjust team/opponent/date grid on mobile */
+            /* Adjust team/opponent/date grid on mobile - make it 2 rows */
             .game-info > div:first-child {
+                grid-template-columns: 1fr 1fr !important;
                 gap: 6px !important;
+            }
+
+            /* Make date input span full width on mobile */
+            #gameDate {
+                grid-column: 1 / -1 !important;
             }
 
             .game-info select,
