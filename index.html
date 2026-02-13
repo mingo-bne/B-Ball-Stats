@@ -3783,11 +3783,21 @@
         
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || isLocalhost)) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-                    .catch(err => {
-                        console.log('⚠️ Service Worker registration failed:', err.message);
-                    });
+                // First, unregister any existing service workers to prevent conflicts
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (let registration of registrations) {
+                        registration.unregister().then(() => {
+                            console.log('Unregistered old service worker');
+                        });
+                    }
+                }).then(() => {
+                    // Now register the new service worker
+                    return navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+                }).then(reg => {
+                    console.log('✅ Service Worker registered:', reg.scope);
+                }).catch(err => {
+                    console.log('⚠️ Service Worker registration failed:', err.message);
+                });
             });
         } else if ('serviceWorker' in navigator) {
             console.log('ℹ️ Service Worker not registered - HTTPS or localhost required for PWA features');
