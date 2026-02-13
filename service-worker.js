@@ -1,7 +1,8 @@
 const CACHE_NAME = 'basketball-stats-v1';
 const urlsToCache = [
-  '/basketball-stats-tracker.html',
-  '/manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // Install event - cache files
@@ -10,7 +11,11 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Cache opened');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch(err => {
+          console.log('Cache addAll failed:', err);
+          // Continue even if some files fail to cache
+          return Promise.resolve();
+        });
       })
   );
   self.skipWaiting();
@@ -31,7 +36,12 @@ self.addEventListener('fetch', (event) => {
         
         return fetch(fetchRequest).then((response) => {
           // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (!response || response.status !== 200) {
+            return response;
+          }
+          
+          // Don't cache if not same origin or not basic/cors
+          if (response.type !== 'basic' && response.type !== 'cors') {
             return response;
           }
           
@@ -44,6 +54,16 @@ self.addEventListener('fetch', (event) => {
             });
           
           return response;
+        }).catch(err => {
+          console.log('Fetch failed:', err);
+          // Return a basic response if offline
+          return new Response('Offline - please connect to the internet', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: new Headers({
+              'Content-Type': 'text/plain'
+            })
+          });
         });
       })
   );
