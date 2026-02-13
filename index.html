@@ -144,6 +144,28 @@
             background: #45a049;
         }
 
+        #datePickerBtn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #datePickerBtn:active {
+            transform: scale(0.98);
+        }
+
+        #teamSelectorBtn:hover,
+        #opponentSelectorBtn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #teamSelectorBtn:active,
+        #opponentSelectorBtn:active {
+            transform: scale(0.98);
+        }
+
         .main-content {
             display: block;
             width: 100%;
@@ -1024,15 +1046,53 @@
                 font-size: 12px !important;
             }
 
-            /* Adjust team/opponent/date grid on mobile - make it 2 rows */
+            /* Adjust team/opponent/date grid on mobile */
             .game-info > div:first-child {
-                grid-template-columns: 1fr 1fr !important;
+                justify-content: center !important;
                 gap: 6px !important;
+                flex-wrap: nowrap !important;
             }
 
-            /* Make date input span full width on mobile */
-            #gameDate {
-                grid-column: 1 / -1 !important;
+            /* Make all selector buttons smaller on mobile with flex */
+            #teamSelectorBtn,
+            #opponentSelectorBtn {
+                min-width: 70px !important;
+                height: 70px !important;
+                flex: 1 1 0 !important;
+                max-width: none !important;
+            }
+
+            #datePickerBtn {
+                width: 70px !important;
+                min-width: 70px !important;
+                height: 70px !important;
+                flex-shrink: 0 !important;
+            }
+
+            #teamLogoDisplay {
+                width: 35px !important;
+                height: 35px !important;
+            }
+
+            #teamSelectorBtn span:last-child,
+            #opponentSelectorBtn span:last-child {
+                font-size: 8px !important;
+            }
+
+            #opponentSelectorBtn span:first-child {
+                font-size: 24px !important;
+            }
+
+            #datePickerBtn span:first-child {
+                font-size: 20px !important;
+            }
+
+            #dateDisplayMonth {
+                font-size: 9px !important;
+            }
+
+            #dateDisplayDay {
+                font-size: 18px !important;
             }
 
             .game-info select,
@@ -1092,6 +1152,16 @@
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             border: none;
+        }
+
+        body.theme-default .header h1 {
+            color: #1e3c72 !important;
+        }
+
+        body.theme-default .header button {
+            color: #1e3c72 !important;
+            background: rgba(30, 60, 114, 0.1) !important;
+            border: 1px solid rgba(30, 60, 114, 0.3) !important;
         }
 
         body.theme-default .roster-panel {
@@ -1260,14 +1330,34 @@
                 </div>
             </div>
             <div class="game-info">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box;">
-                    <select id="teamSelector" onchange="switchTeam()" style="width: 100%; box-sizing: border-box;">
+                <div style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; align-items: center; justify-content: start;">
+                    <!-- Team Selector Button -->
+                    <button id="teamSelectorBtn" onclick="showTeamSelectorModal()" style="min-width: 80px; height: 80px; box-sizing: border-box; padding: 8px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 3px solid rgba(255, 255, 255, 0.4); border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: all 0.3s ease; flex: 1;">
+                        <div id="teamLogoDisplay" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: white; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 20px;">🏀</span>
+                        </div>
+                        <span id="teamNameDisplay" style="font-size: 9px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 4px;">Select Team</span>
+                    </button>
+                    <select id="teamSelector" onchange="switchTeam()" style="display: none;">
                         <option value="">Select My Team...</option>
                     </select>
-                    <select id="opponentSelector" style="width: 100%; box-sizing: border-box;">
+                    
+                    <!-- Opponent Selector Button -->
+                    <button id="opponentSelectorBtn" onclick="showOpponentSelectorModal()" style="min-width: 80px; height: 80px; box-sizing: border-box; padding: 8px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 3px solid rgba(255, 255, 255, 0.4); border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: all 0.3s ease; flex: 1;">
+                        <span style="font-size: 28px;">🆚</span>
+                        <span id="opponentNameDisplay" style="font-size: 9px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 4px;">vs Opponent</span>
+                    </button>
+                    <select id="opponentSelector" style="display: none;">
                         <option value="">Select Opponent...</option>
                     </select>
-                    <input type="date" id="gameDate" style="width: 100%; box-sizing: border-box;">
+                    
+                    <!-- Date Selector Button -->
+                    <button id="datePickerBtn" onclick="showDatePickerModal()" style="width: 80px; min-width: 80px; height: 80px; box-sizing: border-box; padding: 8px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 3px solid rgba(255, 255, 255, 0.4); border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all 0.3s ease; flex-shrink: 0;">
+                        <span style="font-size: 24px;">📅</span>
+                        <span id="dateDisplayMonth" style="font-size: 11px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px;">---</span>
+                        <span id="dateDisplayDay" style="font-size: 22px; font-weight: 900; color: white; line-height: 1;">--</span>
+                    </button>
+                    <input type="date" id="gameDate" style="display: none;">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; margin-top: 8px;">
                     <button id="newGameBtn" onclick="quickCreateGame()" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: none;">+ New Game</button>
@@ -1513,6 +1603,19 @@
             </div>
             <div class="modal-body">
                 <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Team Logo</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div id="teamLogoPreview" style="width: 80px; height: 80px; border: 2px solid #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f5f5f5;">
+                            <span style="color: #999; font-size: 12px;">No Logo</span>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="teamLogoInput" accept="image/*" style="display: none;" onchange="previewTeamLogo(event)">
+                            <button onclick="document.getElementById('teamLogoInput').click()" style="width: 100%; padding: 10px; background: #2196F3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 5px;">Upload Logo</button>
+                            <button onclick="clearTeamLogo()" style="width: 100%; padding: 8px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">Remove Logo</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 5px; color: #1e3c72; font-weight: 600;">Team Name</label>
                     <input type="text" id="teamNameInput" placeholder="Team Name" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; box-sizing: border-box;">
                 </div>
@@ -1590,6 +1693,63 @@
             </div>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" onclick="closeGamesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Modal -->
+    <div id="datePickerModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Select Game Date</h2>
+                <button class="close-modal" onclick="closeDatePickerModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center;">
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <button onclick="changeMonth(-1)" style="padding: 8px 12px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-size: 18px;">◀</button>
+                            <div style="font-size: 18px; font-weight: 600; color: #1e3c72;" id="calendarMonthYear"></div>
+                            <button onclick="changeMonth(1)" style="padding: 8px 12px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-size: 18px;">▶</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 10px;">
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Sun</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Mon</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Tue</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Wed</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Thu</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Fri</div>
+                            <div style="padding: 8px; font-weight: 600; color: #666; font-size: 12px;">Sat</div>
+                        </div>
+                        <div id="calendarDays" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Selector Modal -->
+    <div id="teamSelectorModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Select Your Team</h2>
+                <button class="close-modal" onclick="closeTeamSelectorModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="teamSelectorGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opponent Selector Modal -->
+    <div id="opponentSelectorModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Select Opponent</h2>
+                <button class="close-modal" onclick="closeOpponentSelectorModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="opponentSelectorGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;"></div>
             </div>
         </div>
     </div>
@@ -1841,6 +2001,18 @@
             
             document.getElementById('opponentSelector').value = game.opponent || '';
             document.getElementById('gameDate').value = game.date || '';
+            
+            // Update date display button with compact format
+            if (game.date) {
+                const date = new Date(game.date + 'T00:00:00');
+                const monthStr = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+                const day = date.getDate();
+                document.getElementById('dateDisplayMonth').textContent = monthStr;
+                document.getElementById('dateDisplayDay').textContent = day;
+            } else {
+                document.getElementById('dateDisplayMonth').textContent = '---';
+                document.getElementById('dateDisplayDay').textContent = '--';
+            }
 
             // Check if game is ended
             if (!game.isActive) {
@@ -2013,6 +2185,251 @@
 
         function closeRosterModal() {
             document.getElementById('rosterModal').style.display = 'none';
+        }
+
+        // Date Picker Functions
+        let currentPickerDate = new Date();
+        let selectedDate = null;
+
+        function showDatePickerModal() {
+            // Initialize with current date or game date
+            const gameDateInput = document.getElementById('gameDate');
+            if (gameDateInput.value) {
+                currentPickerDate = new Date(gameDateInput.value + 'T00:00:00');
+            } else {
+                currentPickerDate = new Date();
+            }
+            renderCalendar();
+            document.getElementById('datePickerModal').style.display = 'block';
+        }
+
+        function closeDatePickerModal() {
+            document.getElementById('datePickerModal').style.display = 'none';
+        }
+
+        // Team Logo Handling
+        let tempTeamLogo = null;
+
+        function previewTeamLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempTeamLogo = e.target.result;
+                    const preview = document.getElementById('teamLogoPreview');
+                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearTeamLogo() {
+            tempTeamLogo = null;
+            document.getElementById('teamLogoPreview').innerHTML = '<span style="color: #999; font-size: 12px;">No Logo</span>';
+            document.getElementById('teamLogoInput').value = '';
+        }
+
+        // Team/Opponent Selector Modals
+        function showTeamSelectorModal() {
+            renderTeamSelectorGrid();
+            document.getElementById('teamSelectorModal').style.display = 'block';
+        }
+
+        function closeTeamSelectorModal() {
+            document.getElementById('teamSelectorModal').style.display = 'none';
+        }
+
+        function showOpponentSelectorModal() {
+            if (!currentTeamId) {
+                alert('Please select your team first');
+                return;
+            }
+            renderOpponentSelectorGrid();
+            document.getElementById('opponentSelectorModal').style.display = 'block';
+        }
+
+        function closeOpponentSelectorModal() {
+            document.getElementById('opponentSelectorModal').style.display = 'none';
+        }
+
+        function renderTeamSelectorGrid() {
+            const grid = document.getElementById('teamSelectorGrid');
+            const teamList = Object.values(teams);
+
+            if (teamList.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">No teams yet.<br><button onclick="closeTeamSelectorModal(); showTeamsModal();" style="margin-top: 10px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer;">Create Team</button></div>';
+                return;
+            }
+
+            grid.innerHTML = teamList.map(team => {
+                const isSelected = team.id === currentTeamId;
+                const logo = team.logo ? `<img src="${team.logo}" style="width: 100%; height: 100%; object-fit: cover;">` : '🏀';
+                
+                return `
+                    <div onclick="selectTeamFromModal('${team.id}')" style="padding: 15px; background: ${isSelected ? '#e3f2fd' : 'white'}; border: ${isSelected ? '3px solid #2196F3' : '2px solid #e0e0e0'}; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s;">
+                        <div style="width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 50%; overflow: hidden; background: ${team.color || '#1e3c72'}; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                            ${logo}
+                        </div>
+                        <div style="font-weight: 600; color: #1e3c72; font-size: 14px;">${team.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderOpponentSelectorGrid() {
+            const grid = document.getElementById('opponentSelectorGrid');
+
+            if (opponents.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">No opponents yet.<br><button onclick="closeOpponentSelectorModal(); showTeamsModal();" style="margin-top: 10px; padding: 10px 20px; background: #FF9800; color: white; border: none; border-radius: 6px; cursor: pointer;">Add Opponent</button></div>';
+                return;
+            }
+
+            const currentOpponent = document.getElementById('opponentSelector').options[document.getElementById('opponentSelector').selectedIndex]?.value;
+
+            grid.innerHTML = opponents.map(opp => {
+                const isSelected = opp === currentOpponent;
+                
+                return `
+                    <div onclick="selectOpponentFromModal('${opp}')" style="padding: 15px; background: ${isSelected ? '#fff3e0' : 'white'}; border: ${isSelected ? '3px solid #FF9800' : '2px solid #e0e0e0'}; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s;">
+                        <div style="width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                            🆚
+                        </div>
+                        <div style="font-weight: 600; color: #1e3c72; font-size: 14px;">${opp}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectTeamFromModal(teamId) {
+            document.getElementById('teamSelector').value = teamId;
+            switchTeam(teamId);
+            closeTeamSelectorModal();
+        }
+
+        function selectOpponentFromModal(opponent) {
+            document.getElementById('opponentSelector').value = opponent;
+            
+            // Update opponent display
+            document.getElementById('opponentNameDisplay').textContent = opponent;
+            
+            // Trigger change event for auto-save
+            const event = new Event('change', { bubbles: true });
+            document.getElementById('opponentSelector').dispatchEvent(event);
+            
+            closeOpponentSelectorModal();
+        }
+
+        function changeMonth(delta) {
+            currentPickerDate.setMonth(currentPickerDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const monthYear = document.getElementById('calendarMonthYear');
+            const daysContainer = document.getElementById('calendarDays');
+            
+            const year = currentPickerDate.getFullYear();
+            const month = currentPickerDate.getMonth();
+            
+            // Set month/year display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Get today for highlighting
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+            const todayDate = today.getDate();
+            
+            // Get selected date for highlighting
+            const gameDateInput = document.getElementById('gameDate');
+            let selectedDay = null;
+            if (gameDateInput.value) {
+                const selected = new Date(gameDateInput.value + 'T00:00:00');
+                if (selected.getFullYear() === year && selected.getMonth() === month) {
+                    selectedDay = selected.getDate();
+                }
+            }
+            
+            // Clear previous days
+            daysContainer.innerHTML = '';
+            
+            // Add empty cells for days before first day of month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.style.padding = '8px';
+                daysContainer.appendChild(emptyCell);
+            }
+            
+            // Add day cells
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+                dayCell.style.padding = '10px';
+                dayCell.style.borderRadius = '8px';
+                dayCell.style.cursor = 'pointer';
+                dayCell.style.textAlign = 'center';
+                dayCell.style.fontSize = '14px';
+                dayCell.style.fontWeight = '500';
+                dayCell.style.transition = 'all 0.2s';
+                
+                // Highlight today
+                if (isCurrentMonth && day === todayDate) {
+                    dayCell.style.background = '#e3f2fd';
+                    dayCell.style.color = '#1976d2';
+                }
+                
+                // Highlight selected date
+                if (day === selectedDay) {
+                    dayCell.style.background = '#1e3c72';
+                    dayCell.style.color = 'white';
+                    dayCell.style.fontWeight = '700';
+                }
+                
+                // Hover effect
+                dayCell.onmouseover = function() {
+                    if (day !== selectedDay) {
+                        this.style.background = '#f5f5f5';
+                    }
+                };
+                dayCell.onmouseout = function() {
+                    if (day !== selectedDay) {
+                        if (isCurrentMonth && day === todayDate) {
+                            this.style.background = '#e3f2fd';
+                        } else {
+                            this.style.background = 'transparent';
+                        }
+                    }
+                };
+                
+                // Click handler
+                dayCell.onclick = function() {
+                    selectDate(year, month, day);
+                };
+                
+                daysContainer.appendChild(dayCell);
+            }
+        }
+
+        function selectDate(year, month, day) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            document.getElementById('gameDate').value = dateStr;
+            
+            // Update display button with compact format
+            const date = new Date(year, month, day);
+            const monthStr = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+            document.getElementById('dateDisplayMonth').textContent = monthStr;
+            document.getElementById('dateDisplayDay').textContent = day;
+            
+            // Trigger change event for auto-save
+            const event = new Event('change', { bubbles: true });
+            document.getElementById('gameDate').dispatchEvent(event);
+            
+            closeDatePickerModal();
         }
 
         // Games Management Functions
@@ -2331,23 +2748,36 @@
 
         function showAddTeamForm() {
             editingTeamId = null;
+            tempTeamLogo = null;
             document.getElementById('teamFormTitle').textContent = 'Add Team';
             document.getElementById('teamNameInput').value = '';
             document.getElementById('teamColorInput').value = '#1e3c72';
+            document.getElementById('teamLogoPreview').innerHTML = '<span style="color: #999; font-size: 12px;">No Logo</span>';
+            document.getElementById('teamLogoInput').value = '';
             document.getElementById('addTeamModal').style.display = 'block';
         }
 
         function closeAddTeamModal() {
             document.getElementById('addTeamModal').style.display = 'none';
             editingTeamId = null;
+            tempTeamLogo = null;
         }
 
         function editTeam(teamId) {
             editingTeamId = teamId;
             const team = teams[teamId];
+            tempTeamLogo = team.logo || null;
             document.getElementById('teamFormTitle').textContent = 'Edit Team';
             document.getElementById('teamNameInput').value = team.name;
             document.getElementById('teamColorInput').value = team.color || '#1e3c72';
+            
+            // Show existing logo if available
+            if (team.logo) {
+                document.getElementById('teamLogoPreview').innerHTML = `<img src="${team.logo}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                document.getElementById('teamLogoPreview').innerHTML = '<span style="color: #999; font-size: 12px;">No Logo</span>';
+            }
+            
             document.getElementById('addTeamModal').style.display = 'block';
         }
 
@@ -2364,6 +2794,9 @@
                 // Editing existing team
                 teams[editingTeamId].name = teamName;
                 teams[editingTeamId].color = teamColor;
+                if (tempTeamLogo !== null) {
+                    teams[editingTeamId].logo = tempTeamLogo;
+                }
             } else {
                 // Creating new team
                 const teamId = 'team_' + Date.now();
@@ -2371,6 +2804,7 @@
                     id: teamId,
                     name: teamName,
                     color: teamColor,
+                    logo: tempTeamLogo,
                     created: new Date().toISOString(),
                     players: [],
                     games: []
@@ -2380,6 +2814,7 @@
             saveAllData();
             renderTeamSelector();
             renderMyTeamsList();
+            updateTeamDisplay();
             closeAddTeamModal();
         }
 
@@ -2540,6 +2975,25 @@
             loadTeamData(teamId);
             renderGameSelector();
             renderOpponentSelector();
+            updateTeamDisplay();
+        }
+
+        function updateTeamDisplay() {
+            const team = teams[currentTeamId];
+            if (!team) {
+                document.getElementById('teamNameDisplay').textContent = 'Select Team';
+                document.getElementById('teamLogoDisplay').innerHTML = '<span style="font-size: 20px;">🏀</span>';
+                return;
+            }
+
+            document.getElementById('teamNameDisplay').textContent = team.name;
+            
+            if (team.logo) {
+                document.getElementById('teamLogoDisplay').innerHTML = `<img src="${team.logo}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                document.getElementById('teamLogoDisplay').innerHTML = '<span style="font-size: 20px;">🏀</span>';
+                document.getElementById('teamLogoDisplay').style.background = team.color || '#1e3c72';
+            }
         }
 
         function selectPlayerForActivePanel(jersey) {
@@ -3304,6 +3758,18 @@
         window.closeTeamsModal = closeTeamsModal;
         window.closeGamesModal = closeGamesModal;
         window.closeRosterModal = closeRosterModal;
+        window.showDatePickerModal = showDatePickerModal;
+        window.closeDatePickerModal = closeDatePickerModal;
+        window.changeMonth = changeMonth;
+        window.selectDate = selectDate;
+        window.previewTeamLogo = previewTeamLogo;
+        window.clearTeamLogo = clearTeamLogo;
+        window.showTeamSelectorModal = showTeamSelectorModal;
+        window.closeTeamSelectorModal = closeTeamSelectorModal;
+        window.showOpponentSelectorModal = showOpponentSelectorModal;
+        window.closeOpponentSelectorModal = closeOpponentSelectorModal;
+        window.selectTeamFromModal = selectTeamFromModal;
+        window.selectOpponentFromModal = selectOpponentFromModal;
 
         // Initialize app on load
         window.addEventListener('load', initApp);
